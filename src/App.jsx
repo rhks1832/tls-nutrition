@@ -423,8 +423,8 @@ function SocialButtons({ t }) {
 // ─────────────────────────────────────────────────────────────────────────────
 // 끼니별 운동일/휴식일 버튼 + 조정된 수치 표시
 // ─────────────────────────────────────────────────────────────────────────────
-function MealDayToggle({ baseKcal, baseMacros, ratios, kcalRatio, accent, lang, fontNumber, children }) {
-  const [mode, setMode] = useState("workout"); // "workout" | "rest"
+function MealDayToggle({ baseKcal, baseMacros, ratios, kcalRatio, accent, lang, fontNumber, t, toggleFav, isFav }) {
+  const [mode, setMode] = useState("workout");
 
   const adjKcal    = mode==="workout" ? Math.round(baseKcal*1.10) : Math.round(baseKcal*0.90);
   const adjCarbs   = mode==="workout" ? Math.round(baseMacros.carbs*1.20) : Math.round(baseMacros.carbs*0.85);
@@ -440,7 +440,6 @@ function MealDayToggle({ baseKcal, baseMacros, ratios, kcalRatio, accent, lang, 
 
   return (
     <div>
-      {/* 운동일/휴식일 선택 버튼 */}
       <div style={{ display:"flex", gap:0, marginBottom:14, borderRadius:8, overflow:"hidden", border:`1px solid ${accent}40` }}>
         <button onClick={() => setMode("workout")}
           style={{ flex:1, padding:"10px 8px", border:"none", cursor:"pointer", fontFamily:"inherit",
@@ -458,8 +457,6 @@ function MealDayToggle({ baseKcal, baseMacros, ratios, kcalRatio, accent, lang, 
           😴 {rLabel}
         </button>
       </div>
-
-      {/* 조정된 수치 */}
       <div style={{ display:"flex", gap:8, marginBottom:14 }}>
         {[
           { l:"kcal", v:mKcal.toLocaleString(), u:"", c:"#C9A84C" },
@@ -474,9 +471,7 @@ function MealDayToggle({ baseKcal, baseMacros, ratios, kcalRatio, accent, lang, 
           </div>
         ))}
       </div>
-
-      {/* 실제 식품 선택 (children에 mealCarbs 등 전달) */}
-      {children({ mC, mP, mF })}
+      <MealFoodPanel mealCarbs={mC} mealProtein={mP} mealFat={mF} mealKcal={mKcal} lang={lang} t={t} toggleFav={toggleFav} isFav={isFav} />
     </div>
   );
 }
@@ -999,27 +994,10 @@ export default function App() {
                                   kcalRatio={meal.kcalRatio}
                                   accent={meal.accent}
                                   lang={lang}
-                                  fontNumber={t.fontNumber}>
-                                  {({ mC, mP, mF }) => (
-                                    <div>
-                                      {/* 탄단지 비율 바 */}
-                                      <div style={{ display:"flex", gap:8, marginBottom:14 }}>
-                                        {[[t.carbs,mC,gold,result.macros.carbs],[t.protein,mP,"#7CB9E8",result.macros.protein],[t.fat,mF,"#8BA888",result.macros.fat]].map(([label,g,color,total])=>(
-                                          <div key={label} style={{ flex:1, background:"#161616", borderRadius:8, padding:"14px 8px", textAlign:"center", border:`1px solid ${color}40`, minWidth:0 }}>
-                                            <div style={{ fontSize:10, color:"#CCC", marginBottom:7, letterSpacing:"0.06em", fontWeight:600 }}>{label}</div>
-                                            <div style={{ fontSize:24, fontWeight:700, color, lineHeight:1, fontFamily:t.fontNumber }}>{g}g</div>
-                                            <div style={{ height:3, background:"#2A2A2A", borderRadius:2, margin:"8px 0 4px", overflow:"hidden" }}>
-                                              <div style={{ width:`${Math.round(g/total*100)}%`, height:"100%", background:color }} />
-                                            </div>
-                                            <div style={{ fontSize:10, color:"#AAA" }}>{Math.round(g/total*100)}%</div>
-                                          </div>
-                                        ))}
-                                      </div>
-                                      {/* 식품 선택 */}
-                                      <MealFoodPanel mealCarbs={mC} mealProtein={mP} mealFat={mF} mealKcal={mKcal} lang={lang} t={t} toggleFav={toggleFav} isFav={isFav} />
-                                    </div>
-                                  )}
-                                </MealDayToggle>
+                                  fontNumber={t.fontNumber}
+                                  t={t}
+                                  toggleFav={toggleFav}
+                                  isFav={isFav} />
                               </div>
                               <div style={{ height:20 }} />
                             </div>
