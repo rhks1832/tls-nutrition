@@ -370,24 +370,66 @@ export function ProgressDashboard({ weightLog, lang, fontNumber, weightUnitDispl
         <SectionTitle color="#7CB9E8">{lbl.title}</SectionTitle>
         <button onClick={() => { setEditing(!editing); setInputVal(goalWeight ? String(goalWeight) : ""); }}
           style={{ fontSize: 12, color: gold, background: "transparent", border: `1px solid ${gold}44`, borderRadius: 6, padding: "6px 12px", cursor: "pointer", fontFamily: "inherit", flexShrink: 0 }}>
-          {lbl.setGoal}
+          {editing ? (lang === "en" ? "Cancel" : "취소") : lbl.setGoal}
         </button>
       </div>
+
+      {/* 목표 설정 입력창 */}
       {editing && (
         <div style={{ display: "flex", gap: 8, marginBottom: 14 }}>
-          <div style={{ flex: 1, display: "flex", alignItems: "center", background: bg, border: `1px solid ${line}`, borderRadius: 8, overflow: "hidden" }}>
-            <input type="number" step="0.1" value={inputVal} onChange={e => setInputVal(e.target.value)} placeholder={lang === "en" ? "e.g. 154" : "예) 70"}
-              style={{ flex: 1, background: "transparent", border: "none", color: fg, padding: "10px 12px", fontSize: 14, outline: "none", fontFamily: "inherit" }} />
+          <div style={{ flex: 1, display: "flex", alignItems: "center", background: bg, border: `1px solid ${gold}66`, borderRadius: 8, overflow: "hidden" }}>
+            <input type="number" step="0.1" value={inputVal} onChange={e => setInputVal(e.target.value)}
+              placeholder={lang === "en" ? "e.g. 70" : "예) 70"}
+              style={{ flex: 1, background: "transparent", border: "none", color: fg, padding: "12px 12px", fontSize: 16, outline: "none", fontFamily: "inherit" }} />
             <span style={{ fontSize: 11, color: dim, padding: "0 12px" }}>{weightUnitDisplay}</span>
           </div>
           <button onClick={() => { const v = parseFloat(inputVal); if (!isNaN(v)) { setGoalWeight(v); saveLS(LS_GOAL_W, v); } setEditing(false); }}
-            style={{ background: gold, color: "#0A0A0A", border: "none", borderRadius: 8, padding: "0 16px", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
+            style={{ background: gold, color: "#0A0A0A", border: "none", borderRadius: 8, padding: "0 20px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
             {lbl.save}
           </button>
         </div>
       )}
+
+      {/* 목표 미설정 시 안내 */}
+      {!goalWeight && !editing && (
+        <div style={{ background: bg, borderRadius: 10, padding: "16px", marginBottom: 14, border: `1px dashed ${gold}44`, textAlign: "center" }}>
+          <div style={{ fontSize: 13, color: "#555", marginBottom: 8 }}>
+            {lang === "en" ? "Set your goal weight to track progress" : "목표 체중을 설정하면 달성률을 확인할 수 있어요"}
+          </div>
+          <button onClick={() => { setEditing(true); setInputVal(""); }}
+            style={{ background: gold, color: "#0A0A0A", border: "none", borderRadius: 8, padding: "10px 24px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
+            {lang === "en" ? "+ Set Goal" : "+ 목표 설정하기"}
+          </button>
+        </div>
+      )}
+
+      {/* 목표 설정됐을 때 크게 표시 */}
+      {goalWeight && !editing && (
+        <div style={{ background: "#0A1408", border: "1px solid #2A4A1A", borderRadius: 10, padding: "16px 18px", marginBottom: 14, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div>
+            <div style={{ fontSize: 10, color: "#8BA888", letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 4 }}>
+              {lang === "en" ? "Goal Weight" : "목표 체중"}
+            </div>
+            <div style={{ fontSize: 36, fontWeight: 700, color: "#8BA888", fontFamily: fontNumber, lineHeight: 1 }}>
+              {goalWeight}<span style={{ fontSize: 16, marginLeft: 4, fontWeight: 400 }}>{weightUnitDisplay}</span>
+            </div>
+          </div>
+          {current !== null && (
+            <div style={{ textAlign: "right" }}>
+              <div style={{ fontSize: 10, color: muted, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 4 }}>
+                {lang === "en" ? "Remaining" : "남은 목표"}
+              </div>
+              <div style={{ fontSize: 22, fontWeight: 700, fontFamily: fontNumber,
+                color: (current - goalWeight) > 0 ? "#E8A87C" : "#8BA888" }}>
+                {(current - goalWeight) > 0 ? "-" : "+"}{Math.abs((current - goalWeight).toFixed(1))}{weightUnitDisplay}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
       {current === null ? (
-        <div style={{ textAlign: "center", padding: "16px 0", color: "#444", fontSize: 13 }}>{lbl.noData}</div>
+        <div style={{ textAlign: "center", padding: "8px 0", color: "#444", fontSize: 13 }}>{lbl.noData}</div>
       ) : (
         <>
           <div style={{ display: "flex", gap: 10, marginBottom: pct !== null ? 14 : 0 }}>
@@ -401,7 +443,7 @@ export function ProgressDashboard({ weightLog, lang, fontNumber, weightUnitDispl
           {pct !== null && (
             <div style={{ marginBottom: 12 }}>
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
-                <span style={{ fontSize: 11, color: soft }}>달성률</span>
+                <span style={{ fontSize: 11, color: soft }}>{lang === "en" ? "Achievement" : "달성률"}</span>
                 <span style={{ fontSize: 13, fontWeight: 700, color: gold, fontFamily: fontNumber }}>{pct}%</span>
               </div>
               <div style={{ height: 6, background: "#111", borderRadius: 3, overflow: "hidden" }}>
