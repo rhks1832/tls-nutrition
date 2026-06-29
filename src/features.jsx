@@ -484,6 +484,14 @@ export function ShareCard({ weightLog, result, lang, fontNumber, checks={}, wate
   const start   = sorted.length > 1 ? sorted[0].weight : null;
   const diff    = (start !== null && current !== null) ? (current - start).toFixed(1) : null;
 
+  // 전날 대비 변화 계산
+  const today = todayStr();
+  const todayEntry = weightLog.find(e => e.date === today);
+  const sortedDesc = [...weightLog].sort((a, b) => b.date.localeCompare(a.date));
+  const prevEntry = sortedDesc.find(e => e.date < today);
+  const dailyDiff = (todayEntry && prevEntry)
+    ? (todayEntry.weight - prevEntry.weight).toFixed(1) : null;
+
   const todayChecks = checks[todayStr()] || [false, false, false, false];
   const doneMeals   = todayChecks.filter(Boolean).length;
   const waterMl     = water[todayStr()] || 0;
@@ -686,12 +694,41 @@ export function ShareCard({ weightLog, result, lang, fontNumber, checks={}, wate
               </div>
             </div>
 
-            {diff !== null && (
-              <div style={{ textAlign: "center", marginTop: 10 }}>
-                <span style={{ fontSize: 22, fontWeight: 700, color: parseFloat(diff)<0?"#8BA888":"#E87C7C", fontFamily: fontNumber }}>
-                  {parseFloat(diff)>=0?"+":""}{diff}kg
-                </span>
-                <span style={{ fontSize: 11, color: dim, marginLeft: 8 }}>{start}→{current}kg</span>
+            {/* 체중 변화 — 왼쪽: 전날 대비 / 오른쪽: 총 변화 */}
+            {(dailyDiff !== null || diff !== null) && (
+              <div style={{ display:"flex", gap:8, marginTop:10 }}>
+                {/* 전날 대비 */}
+                {dailyDiff !== null && (
+                  <div style={{ flex:1, background:"#0A0A0A", borderRadius:8, padding:"10px 12px",
+                    border:`1px solid ${parseFloat(dailyDiff)<0?"#2A4A1A":"#4A2A1A"}` }}>
+                    <div style={{ fontSize:9, color:"#555", letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>
+                      {lang==="en" ? "vs Yesterday" : "전날 대비"}
+                    </div>
+                    <div style={{ fontSize:20, fontWeight:700, fontFamily:fontNumber,
+                      color: parseFloat(dailyDiff)<0?"#8BA888":"#E87C7C" }}>
+                      {parseFloat(dailyDiff)>=0?"+":""}{dailyDiff}kg
+                    </div>
+                    <div style={{ fontSize:10, color:"#555", marginTop:2 }}>
+                      {prevEntry?.weight}→{todayEntry?.weight}kg
+                    </div>
+                  </div>
+                )}
+                {/* 총 변화 */}
+                {diff !== null && (
+                  <div style={{ flex:1, background:"#0A0A0A", borderRadius:8, padding:"10px 12px",
+                    border:`1px solid ${parseFloat(diff)<0?"#2A4A1A":"#4A2A1A"}` }}>
+                    <div style={{ fontSize:9, color:"#555", letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>
+                      {lang==="en" ? "Total Change" : "총 변화"}
+                    </div>
+                    <div style={{ fontSize:20, fontWeight:700, fontFamily:fontNumber,
+                      color: parseFloat(diff)<0?"#8BA888":"#E87C7C" }}>
+                      {parseFloat(diff)>=0?"+":""}{diff}kg
+                    </div>
+                    <div style={{ fontSize:10, color:"#555", marginTop:2 }}>
+                      {start}→{current}kg
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
