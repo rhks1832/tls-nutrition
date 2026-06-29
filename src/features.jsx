@@ -599,15 +599,34 @@ export function ShareCard({ weightLog, result, lang, fontNumber, checks={}, wate
       ctx.fillStyle = fillW > 100 ? "#0A0A0A" : "#555";
       ctx.fillText(`${waterMl} / ${waterGoalMl} ml`, 540, barY+22);
 
-      // 체중 변화
-      if (diff !== null) {
+      // 체중 변화 — 전날 대비(왼쪽) + 총 변화(오른쪽)
+      if (dailyDiff !== null || diff !== null) {
         ctx.strokeStyle = "#C9A84C44";
         ctx.beginPath(); ctx.moveTo(120, 740); ctx.lineTo(960, 740); ctx.stroke();
-        ctx.textAlign = "center"; ctx.font = "bold 72px sans-serif";
-        ctx.fillStyle = parseFloat(diff) < 0 ? "#8BA888" : parseFloat(diff) > 0 ? "#E87C7C" : "#C9A84C";
-        ctx.fillText(`${parseFloat(diff)>=0?"+":""}${diff}kg`, 540, 840);
-        ctx.font = "26px sans-serif"; ctx.fillStyle = "#555";
-        ctx.fillText(`${start}kg → ${current}kg`, 540, 888);
+
+        // 전날 대비 (왼쪽)
+        if (dailyDiff !== null) {
+          ctx.textAlign = "left";
+          ctx.font = "20px sans-serif"; ctx.fillStyle = "#555";
+          ctx.fillText(lang === "en" ? "vs Yesterday" : "전날 대비", 120, 790);
+          ctx.font = "bold 60px sans-serif";
+          ctx.fillStyle = parseFloat(dailyDiff) < 0 ? "#8BA888" : "#E87C7C";
+          ctx.fillText(`${parseFloat(dailyDiff)>=0?"+":""}${dailyDiff}kg`, 120, 860);
+          ctx.font = "20px sans-serif"; ctx.fillStyle = "#555";
+          ctx.fillText(`${prevEntry?.weight}→${todayEntry?.weight}kg`, 120, 896);
+        }
+
+        // 총 변화 (오른쪽)
+        if (diff !== null) {
+          ctx.textAlign = "right";
+          ctx.font = "20px sans-serif"; ctx.fillStyle = "#555";
+          ctx.fillText(lang === "en" ? "Total Change" : "총 변화", 960, 790);
+          ctx.font = "bold 60px sans-serif";
+          ctx.fillStyle = parseFloat(diff) < 0 ? "#8BA888" : "#E87C7C";
+          ctx.fillText(`${parseFloat(diff)>=0?"+":""}${diff}kg`, 960, 860);
+          ctx.font = "20px sans-serif"; ctx.fillStyle = "#555";
+          ctx.fillText(`${start}→${current}kg`, 960, 896);
+        }
       }
 
       // 푸터
